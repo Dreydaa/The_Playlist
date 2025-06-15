@@ -1,0 +1,54 @@
+a {
+  text-decoration: none;
+  mix-blend-mode: difference;
+
+  font-size: 24px;
+  cursor: pointer;
+}
+
+a:hover {
+  text-decoration: none;
+  mix-blend-mode: difference;
+  cursor: pointer;
+}
+
+header {
+  position: fixed;
+  padding: 32px;
+}
+
+section {
+  width: 100vw;
+  height: 100vh;
+}
+
+h1 {
+  font-size: 128px;
+  font-family: 'Plantin',serif;
+
+  letter-spacing: 8px;
+
+  mix-blend-mode: difference;
+  color: #fff;
+}
+
+h2 {
+  font-size: 32px;
+  font-family: 'Plantin',serif;
+
+  letter-spacing: 2.5px;
+
+  mix-blend-mode: difference;
+  color: #fff;
+}
+
+.home {
+  background: url('../assets/bg/Chaotic.webp');
+  background-size: cover;
+  background-position: center;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
