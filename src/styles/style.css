@@ -1,6 +1,90 @@
-section {
+nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  flex-direction: row;
+
+  z-index: 100;
+  padding: 16px 16px;
+}
+
+nav ol {
+  color: white;
+  cursor: pointer;
+  padding: 4px 16px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.25);
+  transition: all 0.3s ease;
+}
+
+ol:hover {
+  background-color: white;
+  color: blue;
+}
+
+#mixBackground {
+  position: fixed;
+  top: 0;
+  left: 0;
   width: 100vw;
   height: 100vh;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  z-index: 0; /* Behind everything */
+}
+
+/* Blurred Background - Full Coverage */
+#mixBackground.blur {
+  background-size: cover; /* Extend beyond viewport */
+  background-position: center;
+}
+
+#mixBackground.blur::after {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: inherit;
+  background-size: cover;
+  background-position: center;
+  filter: blur(10px);
+  z-index: -1;
+}
+
+/* Noisy Background */
+#mixBackground.noise {
+  position: fixed;
+  background-size: cover;
+  background-position: center;
+}
+
+#mixBackground.noise::after {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: inherit;
+  filter: url(#noiseFilter) brightness(0.8) contrast(1.2);
+  z-index: -1;
+}
+
+#player {
+  width: 50vw;
+  height: 100vh;
+  position: fixed;
+  top: 0;
+  right: 0;
+  z-index: 2;
+  /* background-color: red; */
+  display: flex;
+  justify-content: center;
+  align-self: center;
 }
 
 ::-webkit-scrollbar {
@@ -8,12 +92,11 @@ section {
 }
 
 .container {
-  width: 50%;
+  width: 100vw;
   height: 100vh;
+  /* background-color: blue; */
   overflow-y: auto;
   position: relative;
-
-  background-color: red;
 }
 
 .scroll-content {
@@ -50,10 +133,10 @@ section {
   width: 512px;
   height: 512px;
   border-radius: 8px;
-  
+
   overflow: hidden;
   cursor: pointer;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .square-image {
@@ -78,11 +161,187 @@ section {
   font-size: 14px;
 }
 
-.container-player {
-  height: 100vh;
-  width: 50%;
-  top: 0;
-  right: 0;
-  position: fixed;
-  background-color: blue;
+/* ! Player */
+
+.box {
+  padding: 100px 0px;
+  width: 500px;
+  height: 700px;
+  perspective: 1000px;
+}
+
+.cube {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  transform-style: preserve-3d;
+  transform: rotateX(0deg) rotateY(0deg);
+  animation: rotate 10s infinite linear;
+}
+
+.side {
+  position: absolute;
+  width: 500px;
+  height: 700px;
+}
+
+.side2 {
+  position: absolute;
+  width: 500px;
+  height: 500px;
+}
+
+.front {
+  transform: translateZ(250px);
+   background: rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-radius: 20px;
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.1),
+    inset 0 0 8px 4px rgba(255, 255, 255, 0.4);
+}
+.back {
+  transform: rotateY(180deg) translateZ(250px);
+  background-color: transparent;
+}
+.right {
+  transform: rotateY(90deg) translateZ(250px);
+  background-color: transparent;
+}
+.left {
+  transform: rotateY(-90deg) translateZ(250px);
+  background-color: transparent;
+}
+.top {
+  transform: rotateX(90deg) translateZ(250px);
+  background-color: transparent;
+}
+.bottom {
+  transform: rotateX(-90deg) translateZ(450px);
+  background-color: transparent;
+}
+
+.front::before {
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.8),
+    transparent
+  );
+}
+
+.front::after {
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.8),
+    transparent,
+    rgba(255, 255, 255, 0.3)
+  );
+}
+
+@keyframes roate {
+  from {
+    transform: rotateX(0deg) rotateY(0deg);
+  }
+  to {
+    transform: rotateX(0deg) rotateY(360deg);
+  }
+}
+
+/* ! Front player */
+
+.playerCoverContainer {
+  width: 100%;
+  height: 400px;
+  /* background-color: white; */
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.playerCover {
+  width: 18vw;
+  height: 18vw;
+
+  filter: drop-shadow(0 16px 32px rgba(0, 0, 0, 0.75));
+  border-radius: 16px;
+  /* background-color: rebeccapurple;
+  border: 1px solid red; */
+}
+
+.playerInfo {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: row;
+  width: 100%;
+  color: white;
+  font-size: 32px;
+}
+
+/* ! Players Controls */
+
+.playerControlsContainer {
+  width: 100%;
+  padding: 30px;
+}
+
+.playerControls {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+}
+
+.playerButtons {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.playerButtons button {
+  color: white;
+  padding: 8px;
+  border-radius: 50%;
+  transition: all 0.2 ease;
+}
+
+.playerButtons button:hover {
+  cursor: pointer;
+  transform: scale(1.05);
+}
+
+.timeDisplay {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+
+  font-family: "Gotham", sans-serif;
+  color: white;
+  font-size: 16px;
+}
+
+.progressBar {
+  flex-grow: 1;
+  height: 8px;
+  background-color: rgba(0, 0, 0, 0.3);
+  border-radius: 8px;
+  outline: none;
+  -webkit-appearance: none;
+}
+
+.progressBar::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 2px;
+  height: 8px;
+  border-radius: 8px;
+  background-color: white;
+  cursor: pointer;
 }

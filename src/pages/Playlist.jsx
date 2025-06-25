@@ -1,20 +1,75 @@
 import { useEffect, useRef } from "react";
 import "../styles/style.css";
 import "../Components/App";
+import {
+  Play,
+  Pause,
+  SkipBack,
+  SkipForward,
+  Shuffle,
+  Repeat,
+  MicVocal,
+  InfoIcon,
+  Maximize,
+  Volume2,
+} from "lucide-react";
+import { useAudioPlayer } from "../Components/useAudioPlayer";
+import { useBackgroundEffects } from "../Components/backgroundsEffects";
+import { playlist } from "../Components/playlistData";
 
 function Playlist() {
+  const {
+    isPlaying,
+    setCurrentTrackIndex,
+    currentTrackIndex,
+    currentTime,
+    duration,
+    currentTrack,
+    shuffle,
+    repeat,
+    togglePlay,
+    handleNext,
+    handlePrevious,
+    handletimeUpdate,
+    toggleShuffle,
+    toggleRepeat,
+    audioRef,
+  } = useAudioPlayer();
+
+  const { activeEffect, setActiveEffect, getBackgroundStyle, isLoadingColor } =
+    useBackgroundEffects(currentTrack);
+
   const containerRef = useRef(null);
   const grayCircleRef = useRef(null);
   const coloredSquaresRef = useRef(null);
   const scrollIndicatorRef = useRef(null);
+  const progressbarRef = useRef(null);
+
+  const formatTime = (time) => {
+    if (isNaN(time)) return "0:00";
+    const minutes = Math.floor(time / 60);
+    const seconds = Math.floor(time % 60);
+    return `${minutes}:${seconds < 10 ? "0" : ""}${seconds}`;
+  };
 
   useEffect(() => {
+    const handleSquareClick = (index) => {
+      // Assuming you have access to these from useAudioPlayer
+      setCurrentTrackIndex(index % playlist.length);
+      if (!isPlaying) {
+        togglePlay();
+      }
+
+      console.log(`Image ${index} clicked!`);
+    };
+
     class CircularScrollAnimation {
-      constructor(container, grayCircle, coloredSquares, scrollIndicator) {
+      constructor(container, grayCircle, coloredSquares, scrollIndicator, clickHandler) {
         this.container = container;
         this.grayCircle = grayCircle;
         this.coloredSquaresContainer = coloredSquares;
         this.scrollIndicator = scrollIndicator;
+        this.handleSquareClick = clickHandler;
 
         this.totalSquares = 72; // Reduced for better visibility
         this.angleStep = 5; // Evenly distribute
@@ -162,42 +217,42 @@ function Playlist() {
 
       // Ajoutez cette méthode dans votre classe CircularScrollAnimation
 
-      handleSquareClick(index) {
-        console.log(`Image ${index} cliquée!`);
+      // handleSquareClick(index) {
+      //   console.log(`Image ${index} cliquée!`);
 
-        // Créer un carré de debug rouge
-        const debugSquare = document.createElement("div");
-        debugSquare.style.position = "fixed";
-        debugSquare.style.top = "50%";
-        debugSquare.style.left = "50%";
-        debugSquare.style.transform = "translate(-50%, -50%)";
-        debugSquare.style.width = "200px";
-        debugSquare.style.height = "200px";
-        debugSquare.style.backgroundColor = "red";
-        debugSquare.style.border = "3px solid black";
-        debugSquare.style.zIndex = "10000";
-        debugSquare.style.display = "flex";
-        debugSquare.style.alignItems = "center";
-        debugSquare.style.justifyContent = "center";
-        debugSquare.style.color = "white";
-        debugSquare.style.fontSize = "20px";
-        debugSquare.style.fontWeight = "bold";
-        debugSquare.style.cursor = "pointer";
-        debugSquare.textContent = `Image ${index}`;
+      //   // Créer un carré de debug rouge
+      //   const debugSquare = document.createElement("div");
+      //   debugSquare.style.position = "fixed";
+      //   debugSquare.style.top = "50%";
+      //   debugSquare.style.left = "50%";
+      //   debugSquare.style.transform = "translate(-50%, -50%)";
+      //   debugSquare.style.width = "200px";
+      //   debugSquare.style.height = "200px";
+      //   debugSquare.style.backgroundColor = "red";
+      //   debugSquare.style.border = "3px solid black";
+      //   debugSquare.style.zIndex = "10000";
+      //   debugSquare.style.display = "flex";
+      //   debugSquare.style.alignItems = "center";
+      //   debugSquare.style.justifyContent = "center";
+      //   debugSquare.style.color = "white";
+      //   debugSquare.style.fontSize = "20px";
+      //   debugSquare.style.fontWeight = "bold";
+      //   debugSquare.style.cursor = "pointer";
+      //   debugSquare.textContent = `Image ${index}`;
 
-        // Ajouter le carré au body
-        document.body.appendChild(debugSquare);
+      //   // Ajouter le carré au body
+      //   document.body.appendChild(debugSquare);
 
-        // Supprimer le carré après 3 secondes ou au clic
-        const removeDebugSquare = () => {
-          if (debugSquare.parentNode) {
-            debugSquare.parentNode.removeChild(debugSquare);
-          }
-        };
+      //   // Supprimer le carré après 3 secondes ou au clic
+      //   const removeDebugSquare = () => {
+      //     if (debugSquare.parentNode) {
+      //       debugSquare.parentNode.removeChild(debugSquare);
+      //     }
+      //   };
 
-        debugSquare.addEventListener("click", removeDebugSquare);
-        setTimeout(removeDebugSquare, 3000);
-      }
+      //   debugSquare.addEventListener("click", removeDebugSquare);
+      //   setTimeout(removeDebugSquare, 3000);
+      // }
 
       // Example helper methods
       playSpecialAnimation(index) {
@@ -218,7 +273,6 @@ function Playlist() {
 
         this.currentRotation = scrollProgress * 360; // Two full rotations
         this.updateAnimation();
-        this.updateScrollIndicator();
       }
 
       updateAnimation() {
@@ -238,20 +292,14 @@ function Playlist() {
           square.style.top = `${y - 50}px`;
         }
       }
-
-      updateScrollIndicator() {
-        const normalizedRotation = this.currentRotation % 360;
-        this.scrollIndicator.textContent = `Rotation: ${Math.round(
-          normalizedRotation
-        )}°`;
-      }
     }
 
     const animation = new CircularScrollAnimation(
       containerRef.current,
       grayCircleRef.current,
       coloredSquaresRef.current,
-      scrollIndicatorRef.current
+      scrollIndicatorRef.current,
+      handleSquareClick
     );
 
     return () => {
@@ -260,12 +308,56 @@ function Playlist() {
         animation.handleScroll
       );
     };
-  }, []);
+  }, [setCurrentTrackIndex, isPlaying, togglePlay, playlist.length]);
 
   return (
     <>
+      {/* <svg style={{ position: "absolute", width: "0", height: "0" }}>
+        <filter id="noiseFilter"  x="0%" y="0%" width="100%" height="100%">
+          <feTurbulence
+            type="fractalNoise"
+            baseFrequency="0.65"
+            numOctaves="50"
+            seed="5"
+            stitchTiles="stitch"
+          />
+          <feColorMatrix
+            type="matrix"
+            values="1 2 0 0 0 0 1 0 0 0 0 0 1 0 0 0 0 0 0.2 0"
+          />
+        </filter>
+      </svg> */}
+
+      <svg style={{ position: "absolute", width: "0", height: "0" }}>
+        <filter id="noiseFilter" x="0%" y="0%" width="100%" height="100%">
+          <feTurbulence
+            type="fractalNoise"
+            baseFrequency="0.75"
+            numOctaves="4"
+            stitchTiles="stitch"
+          ></feTurbulence>
+          <feColorMatrix type="saturate" values="0"></feColorMatrix>
+          <feComponentTransfer>
+            <feFuncR type="linear" slope="1"></feFuncR>
+            <feFuncG type="linear" slope="1"></feFuncG>
+            <feFuncB type="linear" slope="1"></feFuncB>
+            <feFuncA type="linear" slope="0.27"></feFuncA>
+          </feComponentTransfer>
+          <feComponentTransfer>
+            <feFuncR type="linear" slope="1.5" intercept="-1.00" />
+            <feFuncG type="linear" slope="1.5" intercept="-1.00" />
+            <feFuncB type="linear" slope="1.5" intercept="-1.00" />
+          </feComponentTransfer>
+        </filter>
+        <rect width="100%" height="100%" filter="url(#noise-filter)"></rect>
+      </svg>
+
       <header></header>
-      <section>
+      <section
+        id="mixBackground"
+        style={getBackgroundStyle()}
+        className={`${activeEffect} ${isLoadingColor ? "loading" : ""}`}
+      >
         <div className="container" id="scrollContainer" ref={containerRef}>
           <div className="scroll-content"></div>
 
@@ -279,14 +371,127 @@ function Playlist() {
           </div>
         </div>
 
-        <div
-          className="scroll-indicator"
-          id="scrollIndicator"
-          ref={scrollIndicatorRef}
-        >
-          Rotation: 0°
+        {/* Front = Player pause play
+                  right = Lyrics
+                  left = Songs Info
+                  Back = no idea  */}
+        <div id="player">
+          <div className="box">
+            <div className="cube">
+              <div className="side front">
+                <nav>
+                  <ol
+                    className={activeEffect === "colored" ? "active" : ""}
+                    onClick={() => setActiveEffect("colored")}
+                  >
+                    Colored
+                  </ol>
+                  <ol
+                    className={activeEffect === "blur" ? "active" : ""}
+                    onClick={() => setActiveEffect("blur")}
+                  >
+                    Blur
+                  </ol>
+                  <ol
+                    className={activeEffect === "noise" ? "active" : ""}
+                    onClick={() => setActiveEffect("noise")}
+                  >
+                    Noise
+                  </ol>
+                </nav>
+
+                <div className="playerCoverContainer">
+                  <div className="playerCover">
+                    {currentTrack.coverArt && (
+                      <img
+                        src={currentTrack.coverArt}
+                        alt={`${currentTrack.title} cover`}
+                        style={{
+                          width: "100%",
+                          height: "100%",
+                          objectFit: "cover",
+                          borderRadius: "16px",
+                        }}
+                      />
+                    )}
+                  </div>
+                </div>
+
+                <div className="playerControlsContainer">
+                  <div className="playerControls">
+                    <div className="playerInfo">
+                      <h3>{currentTrack.title || "No track Selected"}</h3>
+                      <span>&emsp;-&emsp;</span>
+                      <h4>{currentTrack.artist || ""}</h4>
+                    </div>
+                    <div className="playerButtons">
+                      <button className="fullscreenButton">
+                        <Maximize size={24} />
+                      </button>
+
+                      <button
+                        className={`repeatButton ${repeat ? "active" : ""}`}
+                        onClick={toggleRepeat}
+                      >
+                        <Repeat size={24} />
+                      </button>
+
+                      <button className="prevButton" onClick={handlePrevious}>
+                        <SkipBack size={48} strokeWidth={1} />
+                      </button>
+
+                      <button className="playButton" onClick={togglePlay}>
+                        {isPlaying ? (
+                          <Pause size={64} strokeWidth={1} />
+                        ) : (
+                          <Play size={64} strokeWidth={1} />
+                        )}
+                      </button>
+
+                      <button className="nextButton" onClick={handleNext}>
+                        <SkipForward size={48} strokeWidth={1} />
+                      </button>
+
+                      <button
+                        className={`shuffleButton ${shuffle ? "active" : ""}`}
+                        onClick={toggleShuffle}
+                      >
+                        <Shuffle size={24} />
+                      </button>
+
+                      <button className="infoButton">
+                        <InfoIcon size={24} />
+                      </button>
+                    </div>
+
+                    <div className="timeDisplay">
+                      <span className="currentTime">
+                        {formatTime(currentTime)}
+                      </span>
+                      <input
+                        type="range"
+                        min="0"
+                        max={duration || 0}
+                        value={currentTime}
+                        onChange={handletimeUpdate}
+                        ref={progressbarRef}
+                        className="progressBar"
+                      />
+                      <span className="totalTime">{formatTime(duration)}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className="side back"></div>
+              <div className="side right"></div>
+              <div className="side left"></div>
+              <div className="side2 top"></div>
+              <div className="side2 bottom"></div>
+            </div>
+          </div>
         </div>
       </section>
+      <audio ref={audioRef} />
     </>
   );
 }
