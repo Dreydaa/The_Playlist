@@ -512,9 +512,9 @@ function Playlist() {
                         style={{
                           background: `linear-gradient(to right,rgb(255, 255, 255) 0%,rgb(255, 255, 255) ${
                             (currentTime / duration) * 100
-                          }%, rgba(255, 255, 255, 0.50) ${
+                          }%, ${getIconColor()} ${
                             (currentTime / duration) * 100
-                          }%, rgba(255, 255, 255, 0.50) 100%)`,
+                          }%, ${getIconColor()} 100%)`,
                           backgroundColor: getIconColor(),
                           borderRadius: "2px",
                         }}

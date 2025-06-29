@@ -14,7 +14,7 @@ nav ol {
   cursor: pointer;
   padding: 4px 16px;
   border-radius: 12px;
-  background: rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.5);
   transition: all 0.3s ease;
 }
 
@@ -180,7 +180,7 @@ ol:hover {
 .side {
   position: absolute;
   width: 500px;
-  height: 700px;
+  height: 685px;
 }
 
 .side2 {
@@ -344,9 +344,10 @@ ol:hover {
   -webkit-appearance: none;
   width: 100%;
   height: 6px;
-  border-radius: 4px;
+  border-radius: 50%;
   outline: none;
   transition: background 0.2s ease;
+  border: .5px solid black;
 }
 
 .progressBar::-webkit-slider-thumb {
