@@ -133,6 +133,8 @@ ol:hover {
   height: 512px;
   border-radius: 16px;
 
+  border: 1px red solid;
+
   overflow: hidden;
   cursor: pointer;
 }
